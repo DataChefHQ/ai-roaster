@@ -6,7 +6,7 @@ interactions, and customizable roast outputs.
 
 ## How We Roasted Our Teammates 😂
 
-[![Watch the Video](./src/static/images/roast-video.png)](https://links.datachef.co/happy-2025-video)
+[![Watch the Video](./src/static/images/roast-video-gif.gif)](https://links.datachef.co/happy-2025-video)
 
 ## Features
 
