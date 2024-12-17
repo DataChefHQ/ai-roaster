@@ -1,0 +1,94 @@
+service: ai-roaster
+useDotenv: true
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-warmup
+  - serverless-python-requirements
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  iam:
+    role:
+      managedPolicies:
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+      statements:
+        - Effect: "Allow"
+          Action:
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+            - s3:*
+            - dynamodb:*
+            - bedrock:*
+            - polly:SynthesizeSpeech
+          Resource: "*"
+  runtime: python3.10
+  stage: prod
+  memorySize: 768
+  timeout: 30
+  region: ${env:REGION}
+  lambdaHashingVersion: 20201221
+  stackTags:
+    owner: "Soheil Sheybani"
+    project: "automation"
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+  warmup:
+    default:
+      enabled: true
+      events:
+        - schedule: rate(5 minutes)
+      prewarm: true
+
+package:
+  exclude:
+    - node_modules/**
+    - venv/**
+    - __pycache__/**
+
+resources:
+  Resources:
+    MyPublicS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${env:ASSET_BUCKET}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
+        OwnershipControls: # Move OwnershipControls to the correct place
+          Rules:
+            - ObjectOwnership: ObjectWriter
+
+    PublicBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref MyPublicS3Bucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action: "s3:GetObject"
+              Resource: !Sub "${MyPublicS3Bucket.Arn}/*"
+
+functions:
+  app:
+    handler: src/main.lambda_handler
+    events:
+      - http:
+          cors: true
+          method: ANY
+          path: /{proxy+}
+      - http:
+          cors: true
+          method: ANY
+          path: /
+    environment:
+      BUCKET_NAME: ${env:ASSET_BUCKET}
+      OPENAI_API_KEY: ${env:OPENAI_KEY_SECRET_NAME}

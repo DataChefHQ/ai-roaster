@@ -1,0 +1,4 @@
+Bob - Age: 24 - Nationality: Netherlands - Residence: Amsterdam - Role: Data Scientist
+What Personality Trait Describes Them Better? Whiskey Enjoyer;Over-energetic;Chill;Serious;Big Brains AI;Shy;Humorous;Reckless
+What is Their Most Used Phrase/Quote/Emoji? 🙂;😁;Aha okay ;😅;😂;New post published!
+What other teammates commented on them? Plays the suntar like nobody's business while keeping the DataChef blog alive.;He really enjoyed massage;Bob is waiting for his VISA to America!;By now you have probably developed BobLLM, who writes blog posts on your behalf;);Bob seems to have that toxic relationship where he breaks up with DataChef but ends up asking us back every time ;Cooks fast & delicious but leaves the kitchen in MESS.

@@ -1,0 +1,56 @@
+name: "Deploy"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load .env File
+        run: |
+          set -a
+          [ -f .env ] && source .env
+          echo "AWS_REGION=$REGION" >> $GITHUB_ENV
+          echo "AWS_ACCOUNT=$AWS_ACCOUNT" >> $GITHUB_ENV
+          echo "GITHUB_CI_ROLE=$GITHUB_CI_ROLE" >> $GITHUB_ENV
+          echo "ASSET_BUCKET=$ASSET_BUCKET" >> $GITHUB_ENV
+          set +a
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.AWS_ACCOUNT }}:role/${{ env.GITHUB_CI_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Copy images to S3
+        run: |
+          aws s3 cp ./src/static/images/ s3://${{ env.ASSET_BUCKET }}/ --recursive --acl public-read
+
+      - name: Use Node.js v18.20.5
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.20.5
+
+      - run: npm ci
+
+      - name: install serverless
+        run: npm i -g serverless@3
+
+      - name: install poetry
+        run: pip install poetry
+
+      - name: serverless deploy
+        run: sls deploy --verbose

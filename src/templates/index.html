@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>AI Roaster</title>
+    <link rel="icon" type="image/png" href="https://{{s3_bucket}}.s3.{{region}}.amazonaws.com/favicon.png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    {% include 'github.html' %}
+
+    <div>
+        <i id="volumeIcon" class="fas fa-volume-up volume-icon"></i>
+    </div>
+    <button id="share-button" class="share-button" onclick="copyToClipboard()">Share the roast</button>
+    <div class="copied-message" id="copiedMessage">Copied to clipboard!</div>
+    <div id="roast_id" style="display: none"></div>
+
+    <div class="central">
+        <h1 class="heading-text"> 🎄 AI Roaster 🔥</h1>
+
+        <div class="container">
+            <div style="min-height: 540px;">
+                {% if image %}
+                    <div class="image-container">
+                        <img class="overlay-image" id="image-chef" style="display: block;" src={{ image }}>
+                        <img class="overlay-image" id="image-roast" style="display: block;" src={{ roast_image }}>
+                    </div>
+                    <div class="response-text" id="response">{{ roast }}</div>
+                {% else %}
+                    <div class="image-container">
+                        <img class="background-image" id="bg-image" src="https://chef-roaster.s3.eu-west-1.amazonaws.com/chef_roast_placeholder.webp" />
+                        <img class="overlay-image" id="image-chef">
+                        <img class="overlay-image" id="image-roast">
+                    </div>
+                    <div class="response-text" id="response"></div>
+                {% endif %}
+            </div>
+
+            <div class="describe">
+                <input class="describe__input" type="text" id="prompt" placeholder="Describe your teammate, leave empty for a random roast"></input>
+                <div class="describe__button" style="display: flex; justify-content: end">
+                    <button id="roast-button" class="button" onclick="submitForm()" onmouseover="changeText(this)"
+                            onmouseout="resetText(this)">
+                        Roast 👿
+                    </button>
+                    <button id="roast-button-loading" class="button button-roasting" disabled>
+                        Roasting... 🔥
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading">
+                <div class="spinner" id="spinner" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</body>
+</html>
